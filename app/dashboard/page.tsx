@@ -1,15 +1,23 @@
+// app/dashboard/page.tsx
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!session?.user) {
+      router.push("/login");
+    }
+  }, [session, router]);
+
   if (!session?.user) {
-    router.push("/login");
+    // Optionally, you can return a loading spinner here.
     return null;
   }
 
@@ -24,7 +32,7 @@ export default function DashboardPage() {
       </h1>
       <button
         onClick={() => signOut({ callbackUrl: "/login" })}
-        className="py-2 px-4 bg-secondary text-light rounded hover:bg-primary transition-colors"
+        className="py-2 px-4 bg-secondary text-light rounded hover:bg-primary transition-colors cursor-pointer"
       >
         Logout
       </button>

@@ -1,24 +1,25 @@
-// lib/email.tsx
-import { render } from "@react-email/render";
-import EmailTemplate from "@/components/EmailTemplate";
+import { Resend } from "resend";
 
-export async function resendVerificationEmail(username: string, token: string) {
-  // Render the email template to HTML using JSX
-  const emailHtml = render(<EmailTemplate username={username} token={token} />);
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
-  const res = await fetch("https://api.resend.com/email", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "noreply@yourdomain.com",
-      to: username, // Ideally, the email address
-      subject: "Verify your email",
-      html: emailHtml,
-    }),
+export async function resendVerificationEmail(email: string, token: string) {
+  const verificationLink = `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
+  await resend.emails.send({
+    from: "noreply@techlooom.com",
+    to: email,
+    subject: "Verify Your Email",
+    html: `<p>Click the link below to verify your email:</p>
+           <a href="${verificationLink}">Verify Email</a>`,
   });
+}
 
-  return res.json();
+export async function resendResetEmail(email: string, token: string) {
+  const resetLink = `${process.env.NEXTAUTH_URL}/reset-password/${token}`;
+  await resend.emails.send({
+    from: "norepy@techlooom.com",
+    to: email,
+    subject: "Reset Your Password",
+    html: `<p>Click the link below to reset your password. This link expires in 10 minutes:</p>
+           <a href="${resetLink}">Reset Password</a>`,
+  });
 }

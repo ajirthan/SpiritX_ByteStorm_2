@@ -10,3 +10,4 @@ export default function ClientProviders({
 }) {
   return <SessionProvider>{children}</SessionProvider>;
 }
+

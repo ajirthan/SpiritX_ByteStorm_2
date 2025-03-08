@@ -46,6 +46,7 @@ export default function SignupForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: data.username, password: data.password }),
       });
+      console.log(res);
       const result = await res.json();
       if (!res.ok) {
         setServerError(result.error || "Signup failed");
@@ -65,7 +66,7 @@ export default function SignupForm() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-md mx-auto p-6 bg-light rounded shadow"
+      className="max-w-md mx-auto p-6 rounded"
     >
       <h2 className="text-3xl font-bold text-primary mb-4">Sign Up</h2>
       {serverError && <p className="text-red-500 mb-2">{serverError}</p>}

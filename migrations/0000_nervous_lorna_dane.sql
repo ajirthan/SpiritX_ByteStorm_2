@@ -3,5 +3,7 @@ CREATE TABLE "users" (
 	"username" text NOT NULL,
 	"password" text NOT NULL,
 	"verified" boolean DEFAULT false,
-	"verificationToken" text
+	"verificationToken" text,
+	"resetToken" text,
+	"resetTokenExpiry" timestamp
 );
