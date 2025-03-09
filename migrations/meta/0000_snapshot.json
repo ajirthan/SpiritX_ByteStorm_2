@@ -1,9 +1,182 @@
 {
-  "id": "d2db4cf7-c155-4bbd-afd2-b70ab04c031d",
+  "id": "ae8f731a-b0b0-48d9-baa1-92a783756d9d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "university": {
+          "name": "university",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "runs": {
+          "name": "runs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "ballsFaced": {
+          "name": "ballsFaced",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "inningsPlayed": {
+          "name": "inningsPlayed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "wickets": {
+          "name": "wickets",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "oversBowled": {
+          "name": "oversBowled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "runsConceded": {
+          "name": "runsConceded",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "battingAverage": {
+          "name": "battingAverage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "battingStrikeRate": {
+          "name": "battingStrikeRate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "bowlingEconomy": {
+          "name": "bowlingEconomy",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "bowlingStrikeRate": {
+          "name": "bowlingStrikeRate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "playerPoints": {
+          "name": "playerPoints",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "playerValue": {
+          "name": "playerValue",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_teams": {
+      "name": "user_teams",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "playerId": {
+          "name": "playerId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_teams_userId_users_id_fk": {
+          "name": "user_teams_userId_users_id_fk",
+          "tableFrom": "user_teams",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "user_teams_playerId_players_id_fk": {
+          "name": "user_teams_playerId_players_id_fk",
+          "tableFrom": "user_teams",
+          "tableTo": "players",
+          "columnsFrom": [
+            "playerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -26,30 +199,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "verified": {
-          "name": "verified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "verificationToken": {
-          "name": "verificationToken",
+        "role": {
+          "name": "role",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
-        },
-        "resetToken": {
-          "name": "resetToken",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "resetTokenExpiry": {
-          "name": "resetTokenExpiry",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'user'"
         }
       },
       "indexes": {},

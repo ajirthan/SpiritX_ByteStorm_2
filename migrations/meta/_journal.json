@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1741456304455,
-      "tag": "0000_nervous_lorna_dane",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741467954795,
-      "tag": "0001_low_colleen_wing",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1741479166747,
-      "tag": "0002_red_roughhouse",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1741498344228,
-      "tag": "0003_glamorous_speed_demon",
+      "when": 1741529747747,
+      "tag": "0000_slow_maelstrom",
       "breakpoints": true
     }
   ]

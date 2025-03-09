@@ -5,12 +5,14 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface PlayerStats {
   name: string;
-  battingAverage: number | null;
-  battingStrikeRate: number | null;
-  bowlingEconomy: number | null;
-  bowlingStrikeRate: number | null;
-  runs: number | null;
-  wickets: number | null;
+  battingAverage: number;
+  battingStrikeRate: number;
+  bowlingEconomy: number;
+  bowlingStrikeRate: number;
+  runs: number;
+  wickets: number;
+  playerPoints: number;
+  playerValue: number;
 }
 
 export default function AdminStatsPage() {
@@ -64,30 +66,52 @@ export default function AdminStatsPage() {
                 <th className="py-2 px-4 border-b border-gray-300 w-24">
                   Wickets
                 </th>
+                <th className="py-2 px-4 border-b border-gray-300 w-32">
+                  Points
+                </th>
+                <th className="py-2 px-4 border-b border-gray-300 w-32">
+                  Value
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {stats.map((player, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
+                <tr key={`${player.name}-${idx}`} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border-r border-gray-300">
                     {player.name || "N/A"}
                   </td>
                   <td className="py-2 px-4 border-r border-gray-300">
-                    {player.battingAverage ?? "N/A"}
+                    {player.battingAverage !== null
+                      ? player.battingAverage.toFixed(2)
+                      : "N/A"}
                   </td>
                   <td className="py-2 px-4 border-r border-gray-300">
-                    {player.battingStrikeRate ?? "N/A"}
+                    {player.battingStrikeRate !== null
+                      ? player.battingStrikeRate.toFixed(2)
+                      : "N/A"}
                   </td>
                   <td className="py-2 px-4 border-r border-gray-300">
-                    {player.bowlingEconomy ?? "N/A"}
+                    {player.bowlingEconomy !== null
+                      ? player.bowlingEconomy.toFixed(2)
+                      : "N/A"}
                   </td>
                   <td className="py-2 px-4 border-r border-gray-300">
-                    {player.bowlingStrikeRate ?? "N/A"}
+                    {player.bowlingStrikeRate !== null
+                      ? player.bowlingStrikeRate.toFixed(2)
+                      : "N/A"}
                   </td>
                   <td className="py-2 px-4 border-r border-gray-300">
                     {player.runs ?? 0}
                   </td>
-                  <td className="py-2 px-4">{player.wickets ?? 0}</td>
+                  <td className="py-2 px-4 border-r border-gray-300">
+                    {player.wickets ?? 0}
+                  </td>
+                  <td className="py-2 px-4 border-r border-gray-300">
+                    {player.playerPoints.toFixed(2)}
+                  </td>
+                  <td className="py-2 px-4">
+                    {player.playerValue.toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

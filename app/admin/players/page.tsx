@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+// Types
 interface Player {
   id: number;
   name: string;
@@ -11,18 +13,167 @@ interface Player {
   wickets: number;
 }
 
-export default function AdminPlayersPage() {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [editId, setEditId] = useState<number | null>(null);
+// ========== Edit Modal Component ==========
+interface EditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  player: Player | null;
+  onSave: (updatedPlayer: Player) => void;
+}
+
+function EditModal({ isOpen, onClose, player, onSave }: EditModalProps) {
   const [formData, setFormData] = useState({
     name: "",
     university: "",
     runs: "0",
     wickets: "0",
   });
+
+  // Populate form data when modal opens for editing
+  useEffect(() => {
+    if (player) {
+      setFormData({
+        name: player.name,
+        university: player.university,
+        runs: player.runs.toString(),
+        wickets: player.wickets.toString(),
+      });
+    } else {
+      setFormData({ name: "", university: "", runs: "0", wickets: "0" });
+    }
+  }, [player]);
+
+  if (!isOpen) return null;
+
+  const handleSave = () => {
+    if (!player && formData.name.trim() === "") return;
+    const updated: Player = {
+      id: player ? player.id : 0, // New players: id assigned on server
+      name: formData.name,
+      university: formData.university,
+      runs: parseInt(formData.runs, 10),
+      wickets: parseInt(formData.wickets, 10),
+    };
+    onSave(updated);
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
+        <h2 className="text-xl font-bold mb-4">Edit Player</h2>
+        <div className="mb-4">
+          <label className="block text-sm mb-1">Name</label>
+          <input
+            className="border p-2 w-full rounded"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm mb-1">University</label>
+          <input
+            className="border p-2 w-full rounded"
+            value={formData.university}
+            onChange={(e) =>
+              setFormData({ ...formData, university: e.target.value })
+            }
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm mb-1">Runs</label>
+          <input
+            type="number"
+            min="0"
+            className="border p-2 w-full rounded"
+            value={formData.runs}
+            onChange={(e) => setFormData({ ...formData, runs: e.target.value })}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm mb-1">Wickets</label>
+          <input
+            type="number"
+            min="0"
+            className="border p-2 w-full rounded"
+            value={formData.wickets}
+            onChange={(e) =>
+              setFormData({ ...formData, wickets: e.target.value })
+            }
+          />
+        </div>
+        <div className="flex justify-end space-x-4">
+          <button
+            className="flex-1 py-2 px-4 bg-gray-300 rounded hover:bg-gray-400"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="flex-1 py-2 px-4 bg-primary text-white rounded hover:bg-secondary"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ========== Delete Modal Component ==========
+interface DeleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  player: Player | null;
+  onDelete: (playerId: number) => void;
+}
+
+function DeleteModal({ isOpen, onClose, player, onDelete }: DeleteModalProps) {
+  if (!isOpen || !player) return null;
+
+  const handleConfirm = () => {
+    onDelete(player.id);
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        <h2 className="text-xl font-bold mb-4">Delete Player</h2>
+        <p className="mb-6">
+          Are you sure you want to delete <strong>{player.name}</strong>?
+        </p>
+        <div className="flex justify-end space-x-4">
+          <button
+            className="flex-1 py-2 px-4 bg-gray-300 rounded hover:bg-gray-400"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="flex-1 py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700"
+            onClick={handleConfirm}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ========== AdminPlayersPage ==========
+export default function AdminPlayersPage() {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // For modals
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     loadPlayers();
@@ -44,32 +195,25 @@ export default function AdminPlayersPage() {
     }
   };
 
-  const handleCreateOrUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ============ CREATE/UPDATE LOGIC ============
+  const handleSavePlayer = async (updatedPlayer: Player) => {
+    setIsEditModalOpen(false);
     setLoading(true);
     setError("");
     setMessage("");
 
-    type PlayerPayload = {
-      id?: number;
-      name: string;
-      university: string;
-      runs: number;
-      wickets: number;
-    };
-
-    const payload: PlayerPayload = {
-      name: formData.name,
-      university: formData.university,
-      runs: parseInt(formData.runs, 10),
-      wickets: parseInt(formData.wickets, 10),
-    };
-
     const url = "/api/admin/players";
     let method = "POST";
-    if (editId) {
+    const payload: any = {
+      name: updatedPlayer.name,
+      university: updatedPlayer.university,
+      runs: updatedPlayer.runs,
+      wickets: updatedPlayer.wickets,
+    };
+
+    if (updatedPlayer.id) {
       method = "PUT";
-      payload.id = editId;
+      payload.id = updatedPlayer.id;
     }
 
     try {
@@ -82,9 +226,7 @@ export default function AdminPlayersPage() {
       if (!res.ok) {
         setError(data.error || "Failed to create/update player.");
       } else {
-        setMessage(editId ? "Player updated." : "Player created.");
-        setFormData({ name: "", university: "", runs: "0", wickets: "0" });
-        setEditId(null);
+        setMessage(updatedPlayer.id ? "Player updated." : "Player created.");
         loadPlayers();
       }
     } catch (err) {
@@ -95,18 +237,12 @@ export default function AdminPlayersPage() {
     }
   };
 
-  const handleDelete = async (playerId: number) => {
+  // ============ DELETE LOGIC ============
+  const handleDeletePlayer = async (playerId: number) => {
+    setIsDeleteModalOpen(false);
     setLoading(true);
     setError("");
     setMessage("");
-
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this player?"
-    );
-    if (!confirmDelete) {
-      setLoading(false);
-      return;
-    }
 
     try {
       const res = await fetch(`/api/admin/players?id=${playerId}`, {
@@ -127,21 +263,15 @@ export default function AdminPlayersPage() {
     }
   };
 
-  const startEdit = (player: Player) => {
-    setEditId(player.id);
-    setFormData({
-      name: player.name,
-      university: player.university,
-      runs: player.runs.toString(),
-      wickets: player.wickets.toString(),
-    });
+  // ============ Handlers for UI Buttons ============
+  const openEditModal = (player: Player | null) => {
+    setSelectedPlayer(player);
+    setIsEditModalOpen(true);
   };
 
-  const cancelEdit = () => {
-    setEditId(null);
-    setFormData({ name: "", university: "", runs: "0", wickets: "0" });
-    setError("");
-    setMessage("Edit cancelled.");
+  const openDeleteModal = (player: Player) => {
+    setSelectedPlayer(player);
+    setIsDeleteModalOpen(true);
   };
 
   return (
@@ -155,65 +285,20 @@ export default function AdminPlayersPage() {
           <p className="text-green-500 text-center mb-4">{message}</p>
         )}
 
-        {/* Loader Overlay */}
+        {/* Loader overlay */}
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
             <LoadingSpinner />
           </div>
         )}
 
-        {/* Create/Edit Form */}
-        <form
-          onSubmit={handleCreateOrUpdate}
-          className="mb-6 flex flex-col space-y-4 max-w-md mx-auto"
+        {/* Button to open modal for creating a new player */}
+        <button
+          className="mb-4 py-2 px-4 bg-primary text-white rounded"
+          onClick={() => openEditModal(null)}
         >
-          <input
-            className="border p-2 rounded"
-            placeholder="Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-          />
-          <input
-            className="border p-2 rounded"
-            placeholder="University"
-            value={formData.university}
-            onChange={(e) =>
-              setFormData({ ...formData, university: e.target.value })
-            }
-            required
-          />
-          <input
-            className="border p-2 rounded"
-            placeholder="Runs"
-            type="number"
-            value={formData.runs}
-            onChange={(e) => setFormData({ ...formData, runs: e.target.value })}
-          />
-          <input
-            className="border p-2 rounded"
-            placeholder="Wickets"
-            type="number"
-            value={formData.wickets}
-            onChange={(e) =>
-              setFormData({ ...formData, wickets: e.target.value })
-            }
-          />
-          <div className="flex space-x-4">
-            <button className="py-2 px-4 bg-primary text-light rounded hover:bg-secondary cursor-pointer flex-1">
-              {editId ? "Update Player" : "Create Player"}
-            </button>
-            {editId && (
-              <button
-                type="button"
-                onClick={cancelEdit}
-                className="py-2 px-4 bg-gray-400 text-light rounded hover:bg-gray-500 cursor-pointer flex-1"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
+          + Create New Player
+        </button>
 
         {/* Players Table */}
         <div className="overflow-x-auto">
@@ -232,7 +317,11 @@ export default function AdminPlayersPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {players.map((player) => (
-                <tr key={player.id} className="hover:bg-gray-50">
+                <tr
+                  key={player.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => router.push(`/admin/players/${player.id}`)}
+                >
                   <td className="px-4 py-2 border-r border-gray-300">
                     {player.id}
                   </td>
@@ -249,18 +338,26 @@ export default function AdminPlayersPage() {
                     {player.wickets}
                   </td>
                   <td className="px-4 py-2">
-                    <button
-                      onClick={() => startEdit(player)}
-                      className="text-blue-600 hover:underline mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(player.id)}
-                      className="text-red-500 hover:underline"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(player);
+                        }}
+                        className="flex-1 py-1 px-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(player);
+                        }}
+                        className="flex-1 py-1 px-2 bg-red-600 text-white rounded hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -268,6 +365,22 @@ export default function AdminPlayersPage() {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      <EditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        player={selectedPlayer}
+        onSave={handleSavePlayer}
+      />
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        player={selectedPlayer}
+        onDelete={handleDeletePlayer}
+      />
     </div>
   );
 }

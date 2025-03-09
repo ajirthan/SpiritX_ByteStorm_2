@@ -35,10 +35,15 @@ export default function SignupForm() {
   } = useForm<SignupFormData>({ resolver: zodResolver(signupSchema) });
   const [serverError, setServerError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
   const onSubmit = async (data: SignupFormData) => {
+    // Prevent duplicate submissions
+    if (submitting) return;
+
     setServerError("");
+    setSubmitting(true);
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
@@ -58,6 +63,8 @@ export default function SignupForm() {
     } catch (err) {
       setServerError("An unexpected error occurred");
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -130,9 +137,14 @@ export default function SignupForm() {
         </div>
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-primary text-light rounded hover:bg-secondary transition-colors"
+          disabled={submitting}
+          className={`w-full py-2 px-4 bg-primary text-light rounded transition-colors ${
+            submitting
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-secondary cursor-pointer"
+          }`}
         >
-          Sign Up
+          {submitting ? "Signing up..." : "Sign Up"}
         </button>
       </form>
     </motion.div>
