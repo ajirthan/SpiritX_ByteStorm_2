@@ -1,4 +1,3 @@
-// components/SignupForm.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -44,9 +43,11 @@ export default function SignupForm() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: data.username, password: data.password }),
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+        }),
       });
-      console.log(res);
       const result = await res.json();
       if (!res.ok) {
         setServerError(result.error || "Signup failed");
@@ -86,7 +87,9 @@ export default function SignupForm() {
             {...register("username")}
           />
           {errors.username && (
-            <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.username.message}
+            </p>
           )}
         </div>
         <div className="mb-4">
@@ -100,12 +103,17 @@ export default function SignupForm() {
             {...register("password")}
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
           )}
           <PasswordStrengthIndicator password={passwordValue} />
         </div>
         <div className="mb-4">
-          <label className="block text-secondary mb-1" htmlFor="confirmPassword">
+          <label
+            className="block text-secondary mb-1"
+            htmlFor="confirmPassword"
+          >
             Confirm Password
           </label>
           <input

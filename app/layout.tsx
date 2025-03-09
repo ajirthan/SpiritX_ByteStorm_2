@@ -1,9 +1,10 @@
 import "../styles/globals.css";
 import ClientProviders from "@/components/ClientProviders";
+import Navbar from "@/components/Navbar";
 
 export const metadata = {
-  title: "SecureConnect",
-  description: "A secure and user-friendly authentication system",
+  title: "SecureConnect & Spirit11",
+  description: "Secure authentication and fantasy cricket platform",
 };
 
 export default function RootLayout({
@@ -14,7 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ClientProviders>{children}</ClientProviders>
+        <ClientProviders>
+          <Navbar />
+          {children}
+        </ClientProviders>
       </body>
     </html>
   );

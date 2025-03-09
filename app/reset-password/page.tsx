@@ -8,25 +8,20 @@ export default function ForgotPasswordPage() {
         <h2 className="text-2xl font-bold text-primary mb-4 text-center">
           Reset Password
         </h2>
-        {/* Optional brief instruction */}
         <p className="text-sm text-gray-700 mb-6 text-center">
           Enter your email and we&apos;ll send you a reset link.
         </p>
-
         <ResetPasswordForm />
-
         <div className="mt-6 text-sm text-center">
-          <p>
-            <span className="text-gray-700">Remembered your password? </span>
-            <Link href="/login">
-              <button
-                type="button"
-                className="text-accent font-semibold hover:underline cursor-pointer"
-              >
-                Log In
-              </button>
-            </Link>
-          </p>
+          <span className="text-gray-700">Remembered your password? </span>
+          <Link href="/login">
+            <button
+              type="button"
+              className="text-accent font-semibold hover:underline cursor-pointer"
+            >
+              Log In
+            </button>
+          </Link>
         </div>
       </div>
     </div>

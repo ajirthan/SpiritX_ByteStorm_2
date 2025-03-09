@@ -38,7 +38,6 @@ export default function ResetPasswordTokenPage({
         <p className="text-sm text-gray-700 mb-6 text-center">
           Create a new password for your account.
         </p>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="password"
@@ -55,7 +54,6 @@ export default function ResetPasswordTokenPage({
             Save New Password
           </button>
         </form>
-
         {message && (
           <p className="text-green-600 mt-4 text-center">{message}</p>
         )}

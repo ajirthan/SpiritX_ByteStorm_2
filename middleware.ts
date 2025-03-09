@@ -2,32 +2,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
-  // Now req is of type NextRequest, which has nextUrl, cookies, etc.
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET! });
   const { pathname } = req.nextUrl;
 
-  // Skip Next.js internals, static files, and API routes
+  // Skip certain routes from authentication checks
+  // e.g., /login, /signup, /api/auth, static files, etc.
   if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/api/auth") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/static")
+    pathname.startsWith("/favicon.ico")
   ) {
     return NextResponse.next();
   }
 
-  // Redirect unauthenticated users away from protected routes
-  if (!token && (pathname === "/" || pathname === "/dashboard")) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  // Attempt to retrieve token (null if not authenticated)
+  const token = await getToken({ req });
+
+  // If no token, redirect to login
+  if (!token) {
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    return NextResponse.redirect(loginUrl);
   }
 
-  // If the user is authenticated and trying to access the login page, redirect them to dashboard
-  if (token && pathname === "/login") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
+  // If token exists, let the request continue
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/login", "/dashboard"],
+  matcher: [
+    // Protect all routes except the ones we skip above
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };

@@ -1,4 +1,3 @@
-// components/ResetPasswordForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -16,7 +15,6 @@ export default function ResetPasswordForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: email }),
     });
-
     const data = await res.json();
     setMessage(data.message);
   };

@@ -1,4 +1,3 @@
-// components/LoginForm.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -12,11 +11,10 @@ type LoginFormData = {
   password: string;
 };
 
-// Map known error codes/messages to friendly text
 const ERROR_MESSAGES: Record<string, string> = {
   CredentialsSignin: "Invalid username or password. Please try again.",
   EmailNotVerified:
-    "Your email is not verified. Please check your inbox and verify your email before logging in.",
+    "Your email is not verified. A new confirmation email has been sent. Please verify your email before logging in.",
 };
 
 export default function LoginForm() {
@@ -26,6 +24,8 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setError("");
+
+    // Sign in with next-auth credentials provider
     const res = await signIn("credentials", {
       redirect: false,
       username: data.username,
@@ -33,13 +33,27 @@ export default function LoginForm() {
     });
 
     if (res?.error) {
-      // Map the error returned from NextAuth to a friendly message
+      // Show a user-friendly message if signIn returns an error key we know
       const friendlyMessage =
         ERROR_MESSAGES[res.error] ||
         "An unexpected error occurred. Please try again.";
       setError(friendlyMessage);
     } else {
-      router.push("/dashboard");
+      // No error => fetch session to determine role
+      try {
+        const sessionRes = await fetch("/api/auth/session");
+        const sessionData = await sessionRes.json();
+
+        // If user is admin => /admin/players, else => /user/select-team
+        if (sessionData?.user?.role === "admin") {
+          router.push("/admin/players");
+        } else {
+          router.push("/user/select-team");
+        }
+      } catch (err) {
+        setError("Failed to retrieve session. Please try again.");
+        console.error(err);
+      }
     }
   };
 

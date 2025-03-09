@@ -3,7 +3,7 @@ import LoginForm from "@/components/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-secondary p-4">
+    <div className="min-h-screen flex items-center justify-center bg-secondary p-4">
       <div className="w-full max-w-sm bg-white rounded shadow-lg p-6">
         <h2 className="text-3xl font-bold text-primary mb-6 text-center">
           Login
@@ -22,7 +22,7 @@ export default function LoginPage() {
             </Link>
           </div>
           <div>
-            <span className="text-gray-700">Don’t have an account? </span>
+            <span className="text-gray-700">Don&apos;t have an account? </span>
             <Link href="/signup">
               <button
                 type="button"

@@ -1,4 +1,3 @@
-// components/PasswordStrengthIndicator.tsx
 "use client";
 
 import React from "react";

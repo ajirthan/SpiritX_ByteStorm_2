@@ -1,0 +1,156 @@
+{
+  "id": "755e55a6-f946-40f1-8c9d-0bc74a7e4e53",
+  "prevId": "d2db4cf7-c155-4bbd-afd2-b70ab04c031d",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "university": {
+          "name": "university",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "battingAverage": {
+          "name": "battingAverage",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "battingStrikeRate": {
+          "name": "battingStrikeRate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bowlingEconomy": {
+          "name": "bowlingEconomy",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bowlingStrikeRate": {
+          "name": "bowlingStrikeRate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "runs": {
+          "name": "runs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wickets": {
+          "name": "wickets",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verified": {
+          "name": "verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "verificationToken": {
+          "name": "verificationToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resetToken": {
+          "name": "resetToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resetTokenExpiry": {
+          "name": "resetTokenExpiry",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'user'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
